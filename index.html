@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Garden Bistro - Digital Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .cart-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+        .category-tab.active {
+            background-color: #ef4444;
+            color: white;
+        }
+        .menu-item-card {
+            transition: all 0.2s ease;
+        }
+        .menu-item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">The Garden Bistro</h1>
+                    <p class="text-sm text-gray-600">Fresh. Local. Delicious.</p>
+                </div>
+                <button id="cartToggleBtn" class="relative bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition-colors md:hidden">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                    <span id="cartBadgeMobile" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <section class="bg-white border-b">
+        <div class="container mx-auto px-4 py-4">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search for dishes..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                <i data-lucide="search" class="absolute left-3 top-3.5 w-5 h-5 text-gray-400"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="bg-white border-b sticky top-16 z-30">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex overflow-x-auto gap-2 pb-2" id="categoryTabs">
+                <button class="category-tab active px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-red-500 text-white" data-category="all">All Items</button>
+                <button class="category-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-200" data-category="appetizers">Appetizers</button>
+                <button class="category-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-200" data-category="mains">Main Courses</button>
+                <button class="category-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-200" data-category="desserts">Desserts</button>
+                <button class="category-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-200" data-category="beverages">Beverages</button>
+                <button class="category-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-gray-200" data-category="specials">Specials</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-24">
+        <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Menu items will be rendered here -->
+        </div>
+        <div id="noResults" class="hidden text-center py-12">
+            <i data-lucide="search-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+            <h3 class="text-xl font-medium text-gray-600">No items found</h3>
+            <p class="text-gray-500 mt-2">Try searching for something else</p>
+        </div>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar fixed right-0 top-0 h-full w-full md:w-96 bg-white shadow-xl z-50 overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold">Your Order</h2>
+            <button id="closeCartBtn" class="text-gray-500 hover:text-gray-700">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="cartItems" class="p-4">
+            <!-- Cart items will be rendered here -->
+        </div>
+        <div id="cartFooter" class="sticky bottom-0 bg-white border-t p-4">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-lg font-semibold">Total:</span>
+                <span id="cartTotal" class="text-2xl font-bold text-red-500">$0.00</span>
+            </div>
+            <button id="checkoutBtn" class="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Item Detail Modal -->
+    <div id="itemModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div id="modalContent">
+                    <!-- Modal content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Cart Button -->
+    <button id="desktopCartBtn" class="hidden md:flex fixed bottom-6 right-6 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-red-600 transition-all items-center gap-2 z-40">
+        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+        <span>Cart</span>
+        <span id="cartBadgeDesktop" class="bg-red-600 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center hidden">0</span>
+    </button>
+
+    <!-- Floating Mobile Cart Button -->
+    <button id="mobileCartBtn" class="md:hidden fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600 transition-all z-40">
+        <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+        <span id="cartBadgeFloating" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center hidden">0</span>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
